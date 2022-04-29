@@ -30,7 +30,7 @@ $html_header = "
 <td colspan='7' height='20' align='center'><strong><font color='#000000' size='2' face='tahoma'><span style=background-color:#FFF284>WARNING</span> at 80% In Use &nbsp;&nbsp;&nbsp;&nbsp; <span style=background-color:#FF0000><font color=white>CRITICAL</font></span> at 95% In Use</font>
 </tr>
 </table>
-<table width='100%'><tbody>
+<table width='100%'><thead>
     <tr bgcolor=black>
     <td width='10%' height='15' align='center'> <strong> <font color='white' size='2' face='tahoma' >DHCP Server</font></strong></td>
     <td width='8%' height='15' align='center'> <strong> <font color='white' size='2' face='tahoma' >Scope ID</font></strong></td>
@@ -45,7 +45,8 @@ $html_header = "
     <td width='8%' height='15' align='center'> <strong> <font color='white' size='2' face='tahoma' >End of Range</font></strong></td>
     <td width='8%' height='15' align='center'> <strong> <font color='white' size='2' face='tahoma' >Lease Duration</font></strong></td>
     </tr>
-</table>
+    </thead>
+
 "
 $html_header | Out-File $htmlfile_temp ### Writing the HTML header to the temporary file
 
@@ -70,7 +71,7 @@ Foreach ($DHCP_Server in $DHCP_Servers){ ### Going through the DHCP servers that
         $htmlwrite_count | ForEach-Object {if($_ % 2 -eq 1 ) {$htmlbgcolor = '<tr bgcolor=#CCCCCC>'} } ## Odd Number (gray)
         #### Creating the HTML row for the given DHCP scope with the detailed stats and information
         $current = "
-        <table width='100%'><tbody>
+        
             $htmlbgcolor
             <td width='10%' align='center'>$($DHCP_Server.TrimEnd(".local.domain"))</td>
             <td width='8%' align='center'>$($DHCP_Scope.ScopeId)</td>
@@ -85,7 +86,7 @@ Foreach ($DHCP_Server in $DHCP_Servers){ ### Going through the DHCP servers that
             <td width='8%' align='center'>$($DHCP_Scope.EndRange)</td>
             <td width='8%' align='center'>$($DHCP_Scope.LeaseDuration)</td>
             </tr>
-        </table>
+            
         "
         $current  | Out-File $htmlfile_temp -Append ### Appending the HTML row to the tempory file
 
@@ -93,8 +94,10 @@ Foreach ($DHCP_Server in $DHCP_Servers){ ### Going through the DHCP servers that
         Clear-Variable htmlScopeState, htmlpercentinuse, percentinuserounded, DHCP_Scope_Stats -ErrorAction SilentlyContinue
     }
 }
-Clear-Variable htmlwrite_count
 
+Clear-Variable htmlwrite_count
+#$htmlfile_temp = $htmlfile_temp + "</table>"
+"</table>" | out-file $htmlfile_temp -Append
 #############################################################################################
 ### HTML file cleanup
 #############################################################################################
